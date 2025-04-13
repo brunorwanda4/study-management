@@ -3,10 +3,11 @@ import { CreateUserDto, CreateUserSchema, UpdateUserDto, UpdateUserSchema, UserR
 import { DbService } from 'src/db/db.service';
 import { hashPassword } from 'src/common/utils/hash.util';
 import { generateUsername } from 'src/common/utils/characters.util';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class UserService {
-  constructor(private readonly dbService: DbService) {}
+  constructor(private readonly dbService: DbService) { }
 
   async create(createUserDto: CreateUserDto) {
     const validation = CreateUserSchema.safeParse(createUserDto);
@@ -17,12 +18,9 @@ export class UserService {
     const { email, name, password } = validation.data;
 
     try {
-      const existingUser = await this.dbService.user.findUnique({ where: { email } });
-      if (existingUser) {
-        throw new BadRequestException({error :`Email [${email}] is already in use`, statusCode : 400});
-      }
-
-      const hashedPassword = password ? await hashPassword(password) : undefined;
+      const hashedPassword = password
+        ? await hashPassword(password)
+        : undefined;
 
       return await this.dbService.user.create({
         data: {
@@ -32,22 +30,42 @@ export class UserService {
           username: generateUsername(name),
         },
       });
+
     } catch (error) {
-      if (error.code === 'P2002') {
-        throw new BadRequestException('User already exists');
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === 'P2002'
+      ) {
+        const targetMeta = (error.meta as any)?.target;
+        const target = Array.isArray(targetMeta)
+          ? targetMeta.join(', ')
+          : targetMeta ?? 'field';
+        throw new BadRequestException(` ${target === "User_email_key" ? `Email [${email}] is already in use ` : `A user with this ${target} already exists.`}`);
       }
-      throw new InternalServerErrorException('Failed to create user', error?.message);
+
+      console.error('Create User Unexpected Error:', error);
+      throw new InternalServerErrorException('Failed to create user');
     }
+
   }
 
   async findAll(role?: UserRoleDto) {
     try {
-      const where = role ? { role } : undefined;
-      return await this.dbService.user.findMany({ where });
+      const users = role
+        ? await this.dbService.user.findMany({ where: { role } })
+        : await this.dbService.user.findMany();
+
+      const safeUsers = users.map(({ password, ...rest }) => rest);
+      return safeUsers;
+
     } catch (error) {
-      throw new InternalServerErrorException('Failed to retrieve users', error?.message);
+      throw new NotFoundException({
+        message: 'Something went wrong while retrieving users',
+        error,
+      });
     }
   }
+
 
   async findOne(id?: string, email?: string, username?: string) {
     if (!id && !email && !username) {

@@ -42,6 +42,16 @@ export const LoginUserSchema = z.object({
 
 export type LoginUserDto = z.infer<typeof LoginUserSchema>;
 
+export const RegisterUserSchema = z.object({
+    name : z.string(),
+    email: z.string().email(),
+    password: z.string().min(1, {
+        message: "Password is required"
+    })
+})
+
+export type RegisterUserDto = z.infer<typeof RegisterUserSchema>;
+
 export const AuthUserSchema = z.object({
     id: z.string(),
     email: z.string().email(),

@@ -1,61 +1,58 @@
-import { UserService } from './../user/user.service';
-import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { CreateAuthDto } from './dto/create-auth.dto';
-import { UpdateAuthDto } from './dto/update-auth.dto';
-import { AuthUserDto, LoginUserDto, LoginUserSchema } from 'src/user/dto/user.dto';
+import { Injectable, UnauthorizedException, BadRequestException } from '@nestjs/common';
+import { AuthUserDto, LoginUserDto, LoginUserSchema, RegisterUserDto, CreateUserSchema, CreateUserDto } from 'src/user/dto/user.dto';
 import { verifyPassword } from 'src/common/utils/hash.util';
 import { JwtService } from '@nestjs/jwt';
+import { UserService } from './../user/user.service';
 import { User } from '@prisma/client';
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly userService: UserService, private jwtService: JwtService) { }
-  
+  constructor(
+    private readonly userService: UserService,
+    private readonly jwtService: JwtService,
+  ) { }
+
   async authenticate(input: LoginUserDto): Promise<AuthUserDto> {
     const user = await this.validateUser(input);
-    if (!user) throw new UnauthorizedException(" Invalid credentials");
-    return this.signIn(user)
-
+    if (!user) throw new UnauthorizedException('Invalid credentials');
+    return this.signIn(user);
   }
 
-  async validateUser(user: LoginUserDto) {
-    const validate = LoginUserSchema.safeParse(user);
-    if (!validate.success) return null;
-    const user_data = await this.userService.findOne(undefined, user.email);
-    if (!user) return null;
-    if (!user_data.password) return null;
-    const verify_password = await verifyPassword(user.password, user_data.password);
-    if (!verify_password) return null
-    return user_data;
+  async validateUser(input: LoginUserDto): Promise<User | null> {
+    const validation = LoginUserSchema.safeParse(input);
+    if (!validation.success) return null;
+
+    const { email, password } = validation.data;
+    const user = await this.userService.findOne(undefined, email);
+    if (!user?.password) return null;
+
+    const isPasswordValid = await verifyPassword(password, user.password);
+    if (!isPasswordValid) return null;
+
+    return user;
   }
 
   async signIn(user: User): Promise<AuthUserDto> {
-    const tokenPayload:AuthUserDto = {
-      id: user.id, name: user.name, email: user.email, role: user.role ?? undefined
-    }
+    const payload: AuthUserDto = {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role ?? undefined,
+    };
 
-    const accessToken = await this.jwtService.signAsync(tokenPayload)
+    const accessToken = await this.jwtService.signAsync(payload);
 
-    return { id: user.id, accessToken, name: user.name, email: user.email, role: user.role ?? undefined }
+    return {
+      ...payload,
+      accessToken,
+    };
   }
 
-  // create(createAuthDto: CreateAuthDto) {
-  //   return 'This action adds a new auth';
-  // }
-
-  // findAll() {
-  //   return `This action returns all auth`;
-  // }
-
-  // findOne(id: number) {
-  //   return `This action returns a #${id} auth`;
-  // }
-
-  // update(id: number, updateAuthDto: UpdateAuthDto) {
-  //   return `This action updates a #${id} auth`;
-  // }
-
-  // remove(id: number) {
-  //   return `This action removes a #${id} auth`;
-  // }
+  async register(input: RegisterUserDto) {
+    const newUser: CreateUserDto = {
+      email: input.email, name: input.name, password: input.password
+    };
+    const user = await this.userService.create(newUser);
+    return this.signIn(user);
+  }
 }

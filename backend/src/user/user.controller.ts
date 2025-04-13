@@ -5,7 +5,7 @@ import { ZodValidationPipe } from 'src/common/pipes/zod-validation.pipe';
 
 @Controller('user')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(private readonly userService: UserService) { }
 
   @Post()
   create(@Body(new ZodValidationPipe(CreateUserSchema)) createUserDto: CreateUserDto) {
@@ -18,13 +18,17 @@ export class UserController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.userService.findOne(id);
+  async findOne(@Param('id') id: string) {
+    const user = await this.userService.findOne(id);
+    const { password: _, ...safeUser } = user;
+    return safeUser;
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body(new ZodValidationPipe(UpdateUserSchema)) updateUserDto: UpdateUserDto) {
-    return this.userService.update(id, updateUserDto);
+  async update(@Param('id') id: string, @Body(new ZodValidationPipe(UpdateUserSchema)) updateUserDto: UpdateUserDto) {
+    const user = await this.userService.update(id, updateUserDto);
+    const { password: _, ...safeUser } = user;
+    return safeUser;
   }
 
   @Delete(':id')
