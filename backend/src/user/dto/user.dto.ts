@@ -1,0 +1,33 @@
+import z, { string } from "zod";
+
+export type UserRoleDto =  "STUDENT" |"TEACHER" |"ADMIN" |"SCHOOLSTAFF"
+
+export const CreateUserSchema = z.object({
+    name: z.string().min(1, {
+        message: "Name is required"
+    }).max(50, {
+        message: "Maximum characters are 50"
+    }),
+    email: z.string().email(),
+    password: z.string().optional()
+})
+
+export type CreateUserDto = z.infer<typeof CreateUserSchema>;
+
+export const UpdateUserSchema = z.object({
+    name: z.string().min(1, {
+        message: "Name is required"
+    }).max(50, {
+        message: "Maximum characters are 50"
+    }).optional(),
+    email: z.string().email().optional(),
+    password: z.string().optional().optional(),
+    username : string().min(1, {
+        message : "Username is required"
+    }).max(50, {
+        message :"Maximum characters are 50"
+    }).optional(),
+    role : z.enum(["STUDENT", "TEACHER", "ADMIN", "SCHOOLSTAFF"]).optional()
+})
+
+export type UpdateUserDto = z.infer<typeof UpdateUserSchema>
