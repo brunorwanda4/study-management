@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException, InternalServerErrorException } from '@nestjs/common';
 import { CreateUserDto, CreateUserSchema, UpdateUserDto, UpdateUserSchema, UserRoleDto } from './dto/user.dto';
 import { DbService } from 'src/db/db.service';
 import { hashPassword } from 'src/common/utils/hash.util';
@@ -6,91 +6,123 @@ import { generateUsername } from 'src/common/utils/characters.util';
 
 @Injectable()
 export class UserService {
-  constructor(private readonly dbService: DbService) { }
+  constructor(private readonly dbService: DbService) {}
 
   async create(createUserDto: CreateUserDto) {
-    const validate = CreateUserSchema.safeParse(createUserDto);
-    if (!validate.success) throw new NotFoundException('Invalid data to create user ')
-    const { email, name, password } = validate.data;
+    const validation = CreateUserSchema.safeParse(createUserDto);
+    if (!validation.success) {
+      throw new BadRequestException('Invalid user data provided');
+    }
+
+    const { email, name, password } = validation.data;
+
     try {
-      const user = await this.dbService.user.findUnique({
-        where: { email }
-      });
-      if (user) throw new NotFoundException(`User email ready exits [${email}], try other email`);
-      let hash_password: undefined | string = undefined
-      if (password) {
-        hash_password = await hashPassword(password)
+      const existingUser = await this.dbService.user.findUnique({ where: { email } });
+      if (existingUser) {
+        throw new BadRequestException({error :`Email [${email}] is already in use`, statusCode : 400});
       }
+
+      const hashedPassword = password ? await hashPassword(password) : undefined;
+
       return await this.dbService.user.create({
         data: {
-          email, name, password: hash_password, username: generateUsername(name)
-        }
-      })
+          email,
+          name,
+          password: hashedPassword,
+          username: generateUsername(name),
+        },
+      });
     } catch (error) {
       if (error.code === 'P2002') {
-        throw new NotFoundException('User already exists');
+        throw new BadRequestException('User already exists');
       }
-      throw error;
+      throw new InternalServerErrorException('Failed to create user', error?.message);
     }
   }
 
   async findAll(role?: UserRoleDto) {
     try {
-      if (role) return await this.dbService.user.findMany({ where: { role } })
-      return this.dbService.user.findMany();
+      const where = role ? { role } : undefined;
+      return await this.dbService.user.findMany({ where });
     } catch (error) {
-      throw new NotFoundException({ error, message: "Some thing went wrong to get all users" })
+      throw new InternalServerErrorException('Failed to retrieve users', error?.message);
     }
   }
 
   async findOne(id?: string, email?: string, username?: string) {
     if (!id && !email && !username) {
-      throw new NotFoundException('User not found');
+      throw new BadRequestException('You must provide id, email or username to find a user');
     }
-    try {
-      const where = id ? { id } : email ? { email } : { username };
 
+    const where = id ? { id } : email ? { email } : { username };
+
+    try {
       const user = await this.dbService.user.findUnique({ where });
 
       if (!user) {
-        throw new NotFoundException(`User not found by [${where.email ? where.id : where.username}]`);
+        const identifier = id || email || username;
+        throw new NotFoundException(`User not found with identifier: "${identifier}"`);
       }
+
       return user;
     } catch (error) {
-      if (error?.code === 'P2025') {
+      if (error.code === 'P2025') {
         throw new NotFoundException('User not found');
       }
-      throw error;
+      throw new InternalServerErrorException('Error fetching user', error?.message);
     }
   }
 
- async update(id: string, updateUserDto: UpdateUserDto) {
-    const validate = UpdateUserSchema.safeParse(updateUserDto);
-    if (!validate.success) throw new NotFoundException('valid data to update user ')
-    const {name , role , email ,username, password} = validate.data;
+  async update(id: string, updateUserDto: UpdateUserDto) {
+    const validation = UpdateUserSchema.safeParse(updateUserDto);
+    if (!validation.success) {
+      throw new BadRequestException('Invalid user update data');
+    }
+
+    const { email, username, password, ...rest } = validation.data;
+
     try {
-      if (email) {
-        const user = await this.dbService.user.findUnique({where : {email}});
-        if (user) throw new NotFoundException(`User email is ready exit [${email}], try other email`)
+      const [emailExists, usernameExists] = await Promise.all([
+        email ? this.dbService.user.findUnique({ where: { email } }) : null,
+        username ? this.dbService.user.findUnique({ where: { username } }) : null,
+      ]);
+
+      if (emailExists && emailExists.id !== id) {
+        throw new BadRequestException(`Email [${email}] is already in use`);
       }
-      if (username) {
-        const user = await this.dbService.user.findUnique({where : {username}});
-        if (user) throw new NotFoundException(`User username is ready exit [${username}], try other username`)
+
+      if (usernameExists && usernameExists.id !== id) {
+        throw new BadRequestException(`Username [${username}] is already in use`);
       }
-      let hash_password: undefined | string = undefined
-      if (password) {
-        hash_password = await hashPassword(password)
-      }
-      return await this.dbService.user.update({where :{id}, data :{password : hash_password, ...updateUserDto}})
+
+      const hashedPassword = password ? await hashPassword(password) : undefined;
+
+      return await this.dbService.user.update({
+        where: { id },
+        data: {
+          ...rest,
+          email,
+          username,
+          password: hashedPassword,
+        },
+      });
     } catch (error) {
-      if (error?.code === 'P2025') {
+      if (error.code === 'P2025') {
         throw new NotFoundException('User not found');
       }
-      throw error;
+      throw new InternalServerErrorException('Failed to update user', error?.message);
     }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async remove(id: string) {
+    try {
+      await this.dbService.user.delete({ where: { id } });
+      return { message: `User with ID "${id}" has been removed successfully.` };
+    } catch (error) {
+      if (error.code === 'P2025') {
+        throw new NotFoundException(`User with ID "${id}" not found`);
+      }
+      throw new InternalServerErrorException('Failed to delete user', error?.message);
+    }
   }
 }
