@@ -4,8 +4,15 @@ import MyLink from "@/components/myComponents/myLink";
 import AuthButton from "@/components/page/welcome/auth-button";
 import WelcomeImage from "@/components/page/welcome/welcome-images";
 import AuthTheme from "@/components/theme/auth-theme";
+import { Locale } from "@/i18n";
 
-const WelcomePage = () => {
+interface props {
+  params : Promise<{lang : Locale}>;
+}
+
+const WelcomePage = async (props: props ) => {
+  const params = await props.params;
+  const {lang} = params;
   return (
     <section className=" flex justify-between w-full h-screen">
       <div className=" w-1/2 p-8">
@@ -27,7 +34,7 @@ const WelcomePage = () => {
           </p>
         </div>
         <div className=" mt-8 justify-center items-center flex">
-          <AuthButton />
+          <AuthButton lang={lang}/>
         </div>
         <div className="mt-8  space-y-2">
           <div className=" text-center">

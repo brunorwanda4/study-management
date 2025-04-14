@@ -4,7 +4,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 // ShadCN-style variants
-export const shadcnVariants = cva(
+const shadcnVariants = cva(
   "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
   {
     variants: {
@@ -37,7 +37,7 @@ export const shadcnVariants = cva(
 );
 
 // DaisyUI-style variants
-export const daisyVariants = cva("btn", {
+const daisyVariants = cva("btn", {
   variants: {
     variant: {
       primary: "btn-primary",
@@ -71,13 +71,13 @@ export const daisyVariants = cva("btn", {
 });
 
 // Props for ShadCN version
-type ShadcnButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
+export type ShadcnButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   asChild?: boolean;
   library?: "shadcn";
 } & VariantProps<typeof shadcnVariants>;
 
 // Props for DaisyUI version
-type DaisyButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
+export type DaisyButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   asChild?: boolean;
   library: "daisy";
 } & VariantProps<typeof daisyVariants>;

@@ -1,8 +1,14 @@
 import MyImage from "@/components/myComponents/myImage";
-import { Button } from "@/components/ui/button";
+import MyLink from "@/components/myComponents/myLink";
+import { Button, } from "@/components/ui/button";
+import { Locale } from "@/i18n";
 import React from "react";
 
-const AuthButton = () => {
+interface props {
+  lang: Locale;
+}
+
+const AuthButton = ({ lang }: props) => {
   return (
     <div className=" flex flex-col space-y-4 w-96">
       <Button library="daisy" size={"lg"} variant={"default"}>
@@ -14,12 +20,24 @@ const AuthButton = () => {
         Continuing with Google
       </Button>
       <p className=" flex text-center justify-center">Or user your email</p>
-      <Button library="daisy" size={"lg"} variant={"info"}>
+      <MyLink
+        loading
+        button={{library : "daisy",variant: "info" , size: "lg"}}
+        href={`/${lang}/auth/login`}
+        type="button"
+        className=" w-full"
+      >
         Sign in
-      </Button>
-      <Button library="daisy" size={"lg"} variant={"default"}>
+      </MyLink>
+
+      <MyLink
+        loading
+        button={{library : "daisy",variant: "default" , size: "lg"}}
+        href={`/${lang}/auth/register`}
+        type="button"
+        className=" w-full">
         Create account
-      </Button>
+      </MyLink>
     </div>
   );
 };

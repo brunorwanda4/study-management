@@ -20,7 +20,7 @@ const WelcomeImage = () => {
         className=" w-full h-96 "
         classname="rounded-3xl"
         src={cn(
-          theme === "dark" || theme === "black"
+          (theme === "dark" || theme === "black")
             ? "https://img.freepik.com/free-photo/happy-black-father-children-having-video-call-laptop-home_637285-10589.jpg?uid=R104131663&ga=GA1.1.136419951.1706506037&w=740"
             : "https://img.freepik.com/free-photo/two-siblings-home-together-playing-laptop_23-2148890942.jpg"
         )}

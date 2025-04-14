@@ -1,7 +1,7 @@
 import ThemeSwitcher from '@/components/theme/change-theme'
 import { Button } from '@/components/ui/button'
 import { getDictionary, Locale } from '@/i18n';
-import React from 'react'
+
 
 interface Props {
   params: Promise<{ lang: Locale }>;

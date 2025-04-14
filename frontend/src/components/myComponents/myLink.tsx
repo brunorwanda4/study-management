@@ -1,50 +1,53 @@
-"use client"
-import Link, { useLinkStatus } from "next/link";
-import { Button, shadcnVariants, daisyVariants } from "../ui/button";
+"use client";
 
-type props = {
+import Link, { useLinkStatus } from "next/link";
+import { Button, DaisyButtonProps, ShadcnButtonProps } from "../ui/button";
+import { cn } from "@/lib/utils";
+
+export function LoadingIndicator() {
+  const { pending } = useLinkStatus();
+  return pending ? (
+    <div
+      role="status"
+      aria-label="Loading"
+      className={cn("loading loading-spinner")}
+    />
+  ) : null;
+}
+
+type Props = {
   href: string;
   type?: "button" | "link";
   className?: string;
+  children: React.ReactNode;
+  button?: ShadcnButtonProps | DaisyButtonProps;
+  loading?: boolean;
   classname?: string;
-  children: React.ReactNode | string;
-  button?: typeof shadcnVariants | typeof daisyVariants;
-  loading ?: boolean
 };
+
 const MyLink = ({
   href,
-  type,
-  className,
-  classname,
+  type = "link",
+  className = "",
   children,
   button,
-  loading
-}: props) => {
-  const { pending } = useLinkStatus();
-
+  classname,
+  loading = false,
+}: Props) => {
   if (type === "button") {
     return (
       <Link href={href} className={className}>
-        <Button {...button} className={classname}>
+        <Button {...button} className={cn("w-full", classname)}>
           {children}
-          {loading && (pending && (
-            <span
-              aria-label="Loading"
-              className="loading loading-spinner"
-            ></span>
-          ))}
+          {loading && <LoadingIndicator />}
         </Button>
       </Link>
     );
   }
 
   return (
-    <Link href={href} className={className ? className : "underline"}>
-      {loading ? (pending ? (
-        <span aria-label="Loading" className="loading loading-spinner"></span>
-      ) : (
-        children
-      )) : children}
+    <Link href={href} className={className || "underline"}>
+      {loading ? <LoadingIndicator /> : children}
     </Link>
   );
 };
