@@ -130,6 +130,17 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-base-100;
+    @apply bg-base-300 ;
   }
+}
+
+.title-page {
+  @apply font-bold text-2xl
+}
+.basic-title {
+  @apply font-medium text-lg
+}
+
+.space-together-name {
+  @apply font-medium font-mono leading-1
 }

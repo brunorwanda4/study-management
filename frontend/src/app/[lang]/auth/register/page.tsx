@@ -1,43 +1,26 @@
-import MyLink, { LoadingIndicator } from "@/components/myComponents/myLink";
-import Link from "next/link";
+import AuthProvider from "@/components/page/auth/auth-provider";
 import React from "react";
-
-const links = [
-  { href: '/shop/electronics', label: 'Electronics' },
-  { href: '/shop/clothing', label: 'Clothing' },
-  { href: '/shop/books', label: 'Books' },
-]
- 
-function Menubar() {
-  return (
-    <div>
-      {links.map((link) => (
-        <Link key={link.label} href={link.href}>
-          {link.label} <LoadingIndicator />
-        </Link>
-      ))}
-    </div>
-  )
-}
 
 const RegisterPage = () => {
   return (
-    <div>
-       <Menubar />
-      Register page
-      <Link href="/auth/onboarding" prefetch>
-        Dashboard <LoadingIndicator />
-      </Link>
-      <div className=" h-10"></div>
-      <MyLink
-        loading
-        button={{library : "daisy",variant: "info" , size: "lg"}}
-        href={`/auth/login`}
-        type="button"
-        className=" w-full"
-      >
-        Sign in
-      </MyLink>
+    <div className=" ">
+      <div className=" space-y-1 text-center">
+        <h1 className="title-page">Welcome</h1>
+        <h3 className="">
+          Sign up to your{" "}
+          <span className="font-medium font-mono leading-1 text-sm">
+            space-together
+          </span>{" "}
+          account! ☺️
+        </h3>
+      </div>
+      <div className=" mt-4 flex w-full space-x-4">
+        <div className=" space-y-2">
+          <h4 className=" basic-title">use providers</h4>
+          <AuthProvider />
+        </div>
+        <div>creatieas</div>
+      </div>
     </div>
   );
 };

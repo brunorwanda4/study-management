@@ -14,7 +14,7 @@ const WelcomePage = async (props: props ) => {
   const params = await props.params;
   const {lang} = params;
   return (
-    <section className=" flex justify-between w-full h-screen">
+    <section className=" flex justify-between w-full h-screen bg-base-100">
       <div className=" w-1/2 p-8">
         <div className=" flex justify-end">
           <AuthTheme />

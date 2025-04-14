@@ -17,7 +17,7 @@ const AuthButton = ({ lang }: props) => {
           role="ICON"
           className=" size-6"
         />
-        Continuing with Google
+        Continue with Google
       </Button>
       <p className=" flex text-center justify-center">Or user your email</p>
       <MyLink
