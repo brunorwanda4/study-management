@@ -2,11 +2,12 @@ import AuthLang from "@/components/lang/auth-lang";
 import MyImage from "@/components/myComponents/myImage";
 import MyLink from "@/components/myComponents/myLink";
 import AuthButton from "@/components/page/welcome/auth-button";
+import WelcomeImage from "@/components/page/welcome/welcome-images";
 import AuthTheme from "@/components/theme/auth-theme";
 
 const WelcomePage = () => {
   return (
-    <section className=" flex justify-between w-full">
+    <section className=" flex justify-between w-full h-screen">
       <div className=" w-1/2 p-8">
         <div className=" flex justify-end">
           <AuthTheme />
@@ -16,9 +17,9 @@ const WelcomePage = () => {
         </div>
         <div className=" mt-10 flex flex-col justify-center items-center space-y-1">
           <h1 className=" text-2xl">
-            Welcome to{" "}
-            <span className=" font-black font-mono leading-1">
-              Space Together
+            Welcome to {" "}
+            <span className=" font-medium font-mono leading-1">
+              space-together
             </span>
           </h1>
           <p className="">
@@ -40,7 +41,9 @@ const WelcomePage = () => {
           </div>
         </div>
       </div>
-      <div className=" justify-start flex w-1/2">image</div>
+      <div className=" justify-start flex w-1/2 p-4 h-full">
+        <WelcomeImage />
+      </div>
     </section>
   );
 };
