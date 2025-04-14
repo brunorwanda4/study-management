@@ -1,23 +1,10 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @plugin "daisyui" {
-  themes: light --default, dark --prefersdark, cupcake, bumblebee,
-  retro,
-  cyberpunk,
-  valentine,
-  garden,
-  forest,
-  aqua,
-  lofi,
-  pastel,
-  fantasy,
-  wireframe,
-  black,
-  luxury,
-  dracula,
-  cmyk;
+  themes: light --default, dark --prefersdark, cupcake, bumblebee, retro,
+    cyberpunk, valentine, garden, forest, aqua, lofi, pastel, fantasy, wireframe,
+    black, luxury, dracula, cmyk;
 }
-
 
 @custom-variant dark (&:is(.dark *));
 
@@ -128,6 +115,14 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
+}
+
+@theme {
+  --font-allura: "Allura", "cursive";
+  --font-amagro: "Amagro", "sans-serif";
+  --font-montserrat: "Montserrat", "sans-serif";
+  --font-corinthia: "Corinthia", "sans-serif";
+  --font-smallAndBig: '"Roboto"', "sans-serif";
 }
 
 @layer base {
