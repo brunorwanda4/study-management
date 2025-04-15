@@ -6,7 +6,7 @@ import { Metadata } from "next";
 import React from "react";
 
 export const metadata: Metadata = {
-  title : "Sign up",
+  title : "create an account",
   description : "Create an account on space-together"
 }
 

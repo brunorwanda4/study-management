@@ -87,12 +87,11 @@ const RegisterForm = () => {
     startTransition(async () => {
       const create = await registerUserService(values);
       if (create.data) {
-        setSuccess(create.data.id);
+        setSuccess("Account created successful! ☺️");
       } else if (create.error) {
         setError(create.error);
       }
     });
-    console.log(values)
   }
   return (
     <Form {...form}>
@@ -261,17 +260,25 @@ const RegisterForm = () => {
           )}
         />
         <div>
-          <FormError message={error}/>
-          <FormSuccess message={success}/>
+          <FormError message={error} />
+          <FormSuccess message={success} />
         </div>
         <Button
           type="submit"
+          disabled={isPending}
           library="daisy"
           variant={"info"}
           size={"lg"}
           className=" w-full"
         >
-          Submit
+          Create an account{" "}
+          {isPending && (
+            <div
+              role="status"
+              aria-label="Loading"
+              className={"loading loading-spinner"}
+            />
+          )}
         </Button>
       </form>
     </Form>

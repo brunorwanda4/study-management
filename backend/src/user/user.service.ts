@@ -40,7 +40,7 @@ export class UserService {
         const target = Array.isArray(targetMeta)
           ? targetMeta.join(', ')
           : targetMeta ?? 'field';
-        throw new BadRequestException(` ${target === "User_email_key" ? `Email [${email}] is already in use ` : `A user with this ${target} already exists.`}`);
+        throw new BadRequestException(` ${target === "User_email_key" ? `Email ${email} is already in use ` : `A user with this ${target} already exists.`}`);
       }
 
       console.error('Create User Unexpected Error:', error);
@@ -106,11 +106,11 @@ export class UserService {
       ]);
 
       if (emailExists && emailExists.id !== id) {
-        throw new BadRequestException(`Email [${email}] is already in use`);
+        throw new BadRequestException(`Email ${email} is already in use`);
       }
 
       if (usernameExists && usernameExists.id !== id) {
-        throw new BadRequestException(`Username [${username}] is already in use`);
+        throw new BadRequestException(`Username ${username} is already in use`);
       }
 
       const hashedPassword = password ? await hashPassword(password) : undefined;
@@ -135,10 +135,10 @@ export class UserService {
   async remove(id: string) {
     try {
       await this.dbService.user.delete({ where: { id } });
-      return { message: `User with ID "${id}" has been removed successfully.` };
+      return { message: `User with ID ${id} has been removed successfully.` };
     } catch (error) {
       if (error.code === 'P2025') {
-        throw new NotFoundException(`User with ID "${id}" not found`);
+        throw new NotFoundException(`User with ID ${id} not found`);
       }
       throw new InternalServerErrorException('Failed to delete user', error?.message);
     }
