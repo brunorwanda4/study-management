@@ -7,13 +7,13 @@ interface props {
 }
 const AuthLayout = ({ children }: props) => {
   return (
-    <main className="min-h-screen px-4 py-8">
-      <nav className=" flex justify-end">
+    <main className="min-h-screen px-4 py-2 max-md:w-full">
+      <nav className=" flex justify-end ">
         <AuthTheme />
       </nav>
-      <div className=" grid place-content-center space-y-4">
+      <div className=" grid place-content-center space-y-4 max-lg:w-full">
         <AuthLogo />
-        <section className=" bg-base-100 p-4 card">{children}</section>
+        <section className=" bg-base-100 p-4 card shadow">{children}</section>
         <AuthLang />
       </div>
     </main>
