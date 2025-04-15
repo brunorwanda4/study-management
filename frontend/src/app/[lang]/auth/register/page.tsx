@@ -1,8 +1,22 @@
+import MyLink from "@/components/myComponents/myLink";
 import AuthProvider from "@/components/page/auth/auth-provider";
 import RegisterForm from "@/components/page/auth/forms/register-form";
+import { Locale } from "@/i18n";
+import { Metadata } from "next";
 import React from "react";
 
-const RegisterPage = () => {
+export const metadata: Metadata = {
+  title : "Sign up",
+  description : "Create an account on space-together"
+}
+
+interface props {
+  params : Promise<{lang : Locale}>
+}
+
+const RegisterPage = async (props : props) => {
+  const params = await props.params;
+  const {lang} = params;
   return (
     <div className="">
       <div className=" space-y-1 text-center">
@@ -24,6 +38,9 @@ const RegisterPage = () => {
           <h4 className=" basic-title">User your email:</h4>
           <RegisterForm />
         </div>
+      </div>
+      <div>
+        <div className=" flex space-x-2 items-center">I have an account <MyLink href={`/${lang}/auth/login`} type="link" className=" link text-info ml-1">Login</MyLink></div>
       </div>
     </div>
   );

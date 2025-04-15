@@ -16,8 +16,12 @@ import {
 import { Input } from "@/components/ui/input";
 import { ChangeEvent, useMemo, useState, useTransition } from "react";
 import { CheckIcon, EyeIcon, EyeOffIcon, XIcon } from "lucide-react";
+import { registerUserService } from "@/service/auth/auth-service";
+import { FormError, FormSuccess } from "@/components/myComponents/form-message";
 
 const RegisterForm = () => {
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
   const form = useForm<CreateUserDto>({
     resolver: zodResolver(CreateUserSchema),
     defaultValues: {
@@ -78,13 +82,21 @@ const RegisterForm = () => {
   };
 
   function onSubmit(values: CreateUserDto) {
-    startTransition(() => {
-      console.log(values);
+    setError(null);
+    setSuccess(null);
+    startTransition(async () => {
+      const create = await registerUserService(values);
+      if (create.data) {
+        setSuccess(create.data.id);
+      } else if (create.error) {
+        setError(create.error);
+      }
     });
+    console.log(values)
   }
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 w-96">
         <FormField
           control={form.control}
           name="name"
@@ -100,7 +112,14 @@ const RegisterForm = () => {
                       Full name
                     </span>
                   </label>
-                  <Input disabled={isPending} autoFocus className=" h-12 base text-lg" {...field} id="name" placeholder=" " />
+                  <Input
+                    disabled={isPending}
+                    autoFocus
+                    className=" h-12 base text-lg"
+                    {...field}
+                    id="name"
+                    placeholder=" "
+                  />
                 </div>
               </FormControl>
               {/* <FormDescription>Your full name.</FormDescription> */}
@@ -114,16 +133,22 @@ const RegisterForm = () => {
           render={({ field }) => (
             <FormItem>
               <FormControl>
-              <div className="group relative">
+                <div className="group relative">
                   <label
                     htmlFor={"email"}
                     className="origin-start  group-focus-within:text-foreground has-[+input:not(:placeholder-shown)]:text-foreground absolute top-1/2 block -translate-y-1/2 cursor-text px-1 text-sm transition-all group-focus-within:pointer-events-none group-focus-within:top-0 group-focus-within:cursor-default group-focus-within:text-base group-focus-within:font-medium has-[+input:not(:placeholder-shown)]:pointer-events-none has-[+input:not(:placeholder-shown)]:top-0 has-[+input:not(:placeholder-shown)]:cursor-default has-[+input:not(:placeholder-shown)]:text-base has-[+input:not(:placeholder-shown)]:font-medium "
                   >
                     <span className="bg-base-100 inline-flex px-2">
-                      Email*
+                      Email Address*
                     </span>
                   </label>
-                  <Input disabled={isPending} className=" h-12 base text-lg" {...field} id="email" placeholder=" " />
+                  <Input
+                    disabled={isPending}
+                    className=" h-12 base text-lg"
+                    {...field}
+                    id="email"
+                    placeholder=" "
+                  />
                 </div>
               </FormControl>
               {/* <FormDescription>Your email use and which we will send verification code.</FormDescription> */}
@@ -138,9 +163,9 @@ const RegisterForm = () => {
             <FormItem>
               <FormControl>
                 <div className=" relative group">
-                <label
+                  <label
                     htmlFor={"password"}
-                    className="group-focus-within:text-foreground has-[+input:not(:placeholder-shown)]:text-foreground absolute top-1/2 block -translate-y-1/2 cursor-text px-1 text-sm transition-all group-focus-within:pointer-events-none group-focus-within:top-0 group-focus-within:cursor-default group-focus-within:text-base group-focus-within:font-medium has-[+input:not(:placeholder-shown)]:pointer-events-none has-[+input:not(:placeholder-shown)]:top-0 has-[+input:not(:placeholder-shown)]:cursor-default has-[+input:not(:placeholder-shown)]:text-base has-[+input:not(:placeholder-shown)]:font-medium "
+                    className="group-focus-within:text-foreground has-[+input:not(:placeholder-shown)]:text-foreground absolute top-1/2 block -translate-y-1/2 cursor-text px-1 text-sm transition-all group-focus-within:pointer-events-none group-focus-within:top-0  group-focus-within:cursor-default group-focus-within:text-base group-focus-within:font-medium has-[+input:not(:placeholder-shown)]:pointer-events-none has-[+input:not(:placeholder-shown)]:top-0 has-[+input:not(:placeholder-shown)]:cursor-default has-[+input:not(:placeholder-shown)]:text-base has-[+input:not(:placeholder-shown)]:font-medium "
                   >
                     <span className="bg-base-100 inline-flex px-2">
                       Password*
@@ -149,8 +174,9 @@ const RegisterForm = () => {
                   <Input
                     className=" h-12 base text-lg"
                     type={isVisible ? "text" : "password"}
+                    placeholder=" "
                     disabled={isPending}
-                    {...field} 
+                    {...field}
                     onChange={(e) => handlePasswordChange(e, field.onChange)}
                   />
                   <button
@@ -234,6 +260,10 @@ const RegisterForm = () => {
             </FormItem>
           )}
         />
+        <div>
+          <FormError message={error}/>
+          <FormSuccess message={success}/>
+        </div>
         <Button
           type="submit"
           library="daisy"
