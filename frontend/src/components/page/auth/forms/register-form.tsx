@@ -18,10 +18,20 @@ import { ChangeEvent, useMemo, useState, useTransition } from "react";
 import { CheckIcon, EyeIcon, EyeOffIcon, XIcon } from "lucide-react";
 import { registerUserService } from "@/service/auth/auth-service";
 import { FormError, FormSuccess } from "@/components/myComponents/form-message";
+import { useRouter } from "next/navigation";
+import { Locale } from "@/i18n";
 
-const RegisterForm = () => {
+interface props {
+  lang : Locale
+}
+
+const RegisterForm = ({lang} : props) => {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [password, setPassword] = useState("");
+  const [isVisible, setIsVisible] = useState<boolean>(false);
+  const [isPending, startTransition] = useTransition();
+  const router = useRouter()
   const form = useForm<CreateUserDto>({
     resolver: zodResolver(CreateUserSchema),
     defaultValues: {
@@ -32,10 +42,6 @@ const RegisterForm = () => {
   });
 
   //   password
-  const [password, setPassword] = useState("");
-  const [isVisible, setIsVisible] = useState<boolean>(false);
-  const [isPending, startTransition] = useTransition();
-
   const toggleVisibility = () => setIsVisible((prevState) => !prevState);
 
   const checkStrength = (pass: string) => {
@@ -88,6 +94,7 @@ const RegisterForm = () => {
       const create = await registerUserService(values);
       if (create.data) {
         setSuccess("Account created successful! ☺️");
+        router.push(`/${lang}/auth/onboarding`)
       } else if (create.error) {
         setError(create.error);
       }

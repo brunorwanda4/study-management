@@ -36,7 +36,7 @@ const RegisterPage = async (props : props) => {
         </div>
         <div className=" space-y-2">
           <h4 className=" basic-title">User your email:</h4>
-          <RegisterForm />
+          <RegisterForm lang={lang}/>
         </div>
       </div>
       <div>
