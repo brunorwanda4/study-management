@@ -26,6 +26,7 @@ model User {
   gender    Gender?
   age       Age?
   address   Address?
+  bio       String?
   createAt  DateTime  @default(now())
   updatedAt DateTime  @updatedAt
 }
