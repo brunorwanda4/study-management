@@ -123,7 +123,9 @@ const OnboardingForm = ({}: Props) => {
               >
                 <MyImage
                   src={
-                    "https://img.freepik.com/free-vector/illustration-gallery-icon_53876-27002.jpg"
+                    field.value
+                      ? field.value
+                      : "https://img.freepik.com/free-vector/illustration-gallery-icon_53876-27002.jpg"
                   }
                   className={cn("size-24")}
                   classname=" card"
@@ -284,7 +286,7 @@ const OnboardingForm = ({}: Props) => {
               name="role"
               render={({ field }) => (
                 <FormItem className="space-y-0">
-                  <FormLabel  className=" text-lg">Role</FormLabel>
+                  <FormLabel className=" text-lg">Role</FormLabel>
                   <FormControl>
                     <RadioGroup
                       onValueChange={field.onChange}
@@ -305,7 +307,10 @@ const OnboardingForm = ({}: Props) => {
                       </FormItem>
                       <FormItem className="flex items-center space-x-0 space-y-0">
                         <FormControl>
-                          <RadioGroupItem className=" size-6" value="SCHOOLSTAFF" />
+                          <RadioGroupItem
+                            className=" size-6"
+                            value="SCHOOLSTAFF"
+                          />
                         </FormControl>
                         <FormLabel className="font-normal">
                           School staff
@@ -362,7 +367,12 @@ const OnboardingForm = ({}: Props) => {
               name="location"
               render={({ field }) => (
                 <FormItem className=" w-full">
-                  <FormLabel className=" text-lg">Location</FormLabel>
+                  <FormLabel className=" text-lg">
+                    Location -{" "}
+                    <span className=" text-base font-normal text-gray-500">
+                      In Rwanda
+                    </span>
+                  </FormLabel>
                   <FormControl>
                     <div className="flex gap-2">
                       <div className=" flex flex-col space-y-1 w-full">
@@ -429,7 +439,11 @@ const OnboardingForm = ({}: Props) => {
                 <FormItem>
                   <FormLabel className=" text-lg">Bio</FormLabel>
                   <FormControl>
-                    <Textarea className=" text-lg w-96 h-full min-h-44 " {...field} rows={8} />
+                    <Textarea
+                      className=" text-lg w-96 h-full min-h-44 "
+                      {...field}
+                      rows={8}
+                    />
                   </FormControl>
                 </FormItem>
               )}
